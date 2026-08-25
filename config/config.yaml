@@ -1,0 +1,84 @@
+camera:
+  source: 0
+  fps: 30
+  roi: [0, 0, 0, 0]
+# Băng tải chạy/dừng: khi dừng đủ ổn định thì worker chọn khung nét nhất và
+# kiểm tra đúng một lần. Ngưỡng 2.0 đã đối chiếu với testline.mp4: khung dừng
+# thường dưới 1.1, lúc băng tải chạy từ khoảng 4.3 trở lên.
+stop_and_scan:
+  stable_frames_required: 3
+  motion_threshold: 2.0
+detection:
+  confidence: 0.70
+  iou: 0.50
+  min_slot_radius_px: 12
+  min_slot_radius_fraction: 0.032
+  max_slot_radius_fraction: 0.10
+  min_slot_distance_fraction: 0.07
+  hough_param1: 100
+  hough_param2: 36
+  max_geometry_score: 0.42
+  # 9 giữ được 5 slot + phản xạ nhiễu, đồng thời tránh thử 2.002 tổ hợp mỗi frame.
+  candidate_limit: 9
+  # Camera chỉ chạy hình học ở kích thước này rồi quy đổi tâm về ảnh gốc.
+  # Giữ được ROI/đường đếm nhưng giảm tải cho video 720x1280 và webcam HD.
+  processing_max_dimension: 720
+  # Fallback hình học cho vỉ chụp nghiêng. Các cổng spacing/ellipse vẫn giữ
+  # UNKNOWN cho ảnh nhìn cạnh hoặc che khuất, thay vì tự PASS.
+  enable_chroma_contour_fallback: true
+  chroma_saturation_min: 80
+  chroma_value_min: 45
+  minimum_ellipse_axis_ratio: 0.50
+  contour_min_radius_factor: 0.65
+  enable_clahe_fallback: true
+  clahe_clip_limit: 2.0
+  clahe_tile_grid_size: 8
+  max_projective_spacing_error: 0.065
+  max_line_deviation_ratio: 0.70
+  minimum_spacing_to_radius: 1.20
+  # Nhánh side-view: tâm Hough được căn lại theo vùng màu thay vì coi bán
+  # kính Hough chồng lấn là bán kính viên thật.
+  enable_side_view_fallback: true
+  side_view_max_geometry_score: 0.30
+  side_view_min_spacing_to_radius: 0.80
+  side_view_sample_radius_fraction: 0.26
+  side_view_refine_cross_axis_fraction: 0.70
+  side_view_refine_along_axis_fraction: 0.22
+  side_view_chroma_saturation_min: 50
+  side_view_chroma_value_min: 45
+  side_view_min_chroma_fraction: 0.20
+  # Khi ROI rộng làm Hough chọn nhầm nền, dùng đúng chuỗi màu của profile để
+  # đề xuất lại hàng slot. Candidate chỉ được dùng nếu validator trả PASS.
+  enable_color_guided_fallback: true
+  # Giới hạn riêng nhánh fallback màu để ROI có nhiều vỉ vẫn phản hồi nhanh.
+  # Tâm/màu cuối cùng vẫn được validator đối chiếu lại ở ảnh gốc.
+  color_guided_max_dimension: 480
+  profile_component_limit_per_color: 6
+  # Camera/góc vỉ cố định: lấy màu độc lập tại từng slot và đối chiếu bố cục
+  # tương đối của Product Profile. Tắt trên UI chỉ khi đổi góc lắp camera.
+  strict_position_color_validation: true
+  fixed_pose_candidate_limit: 6
+  # ROI giám sát có thể chứa đồng thời nhiều vỉ. Mỗi candidate PASS hoặc NG
+  # được giữ để hệ thống bật banner cảnh báo ngay khi có vỉ lỗi.
+  allow_multiple_candidates: true
+  maximum_monitor_candidates: 12
+color:
+  confidence: 0.85
+tracking:
+  # Giữ track lâu hơn và chấp nhận bước nhảy lớn hơn giữa hai frame inference.
+  # Camera/băng tải nhanh có thể làm worker bỏ frame cũ để giữ realtime.
+  max_age: 40
+  min_hits: 1
+  distance_threshold: 320
+  # Vỉ lần đầu thấy ngay sát/sau vạch vẫn được chốt, tránh bỏ sót khi nhảy frame.
+  first_seen_crossing_margin_fraction: 0.75
+counting:
+  direction: top_to_bottom
+  line_position: 0.65
+validation:
+  minimum_overall_confidence: 0.85
+  allow_rotation_deg: 10
+preprocessing:
+  white_balance: false
+  clahe: false
+  gamma: 1.0

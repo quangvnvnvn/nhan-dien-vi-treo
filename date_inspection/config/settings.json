@@ -1,0 +1,15 @@
+{
+  "detector": {
+    "threshold": 30,
+    "min_contour_area": 800,
+    "max_contour_area": 10000000,
+    "occupancy_threshold": 0.025,
+    "minimum_frames_present": 3,
+    "minimum_frames_absent": 4,
+    "debounce_ms": 300,
+    "minimum_gap_frames": 8,
+    "sensitivity": 1.0,
+    "direction": "trái → phải"
+  },
+  "rois": {}
+}

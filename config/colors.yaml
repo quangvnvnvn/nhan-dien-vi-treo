@@ -1,0 +1,67 @@
+classifier_defaults: &classifier_defaults
+  # Pixel nhạt/bóng phản quang của vỉ nhựa bị loại trước khi tính độ phủ.
+  sampling:
+    minimum_saturation: 35
+    minimum_value: 25
+    maximum_value: 255
+    minimum_eligible_pixels: 24
+    minimum_eligible_fraction: 0.06
+  # Một màu chỉ hợp lệ khi HSV và LAB đồng thuận trên đủ nhiều pixel.
+  scoring:
+    minimum_hsv_coverage: 0.14
+    minimum_lab_coverage: 0.14
+    minimum_combined_coverage: 0.12
+    target_hsv_coverage: 0.22
+    target_lab_coverage: 0.22
+    target_combined_coverage: 0.20
+    minimum_matching_pixels: 20
+    target_matching_pixels: 48
+    minimum_agreement: 0.82
+    minimum_confidence: 0.85
+    dominance_margin: 0.12
+    maximum_competitor_ratio: 0.78
+    hsv_coverage_weight: 0.18
+    lab_coverage_weight: 0.18
+    combined_coverage_weight: 0.34
+    support_weight: 0.12
+    agreement_weight: 0.18
+
+colors:
+  purple:
+    display_name: "Tím"
+    aliases: ["tím", "tim", "purple", "lavender", "tím lavender"]
+    # Dữ liệu camera thực tế cho thấy viên Xanh dương nằm ở hue 117-123,
+    # còn Tím bắt đầu từ khoảng 125. Không để hai dải chồng nhau: một slot
+    # phải được phân loại bằng bằng chứng màu độc lập, không vì profile đang
+    # *mong đợi* màu đó mà bị đổi nhãn thành PASS.
+    hsv_min: [125, 35, 25]
+    hsv_max: [170, 255, 255]
+    lab_min: [0, 110, 65]
+    lab_max: [255, 220, 180]
+    classification: *classifier_defaults
+  blue:
+    display_name: "Xanh dương"
+    aliases: ["xanh dương", "xanh duong", "xanh lam", "blue"]
+    hsv_min: [90, 35, 25]
+    # Xanh dương ở webcam/băng tải thực tế thường dịch đến hue 123. Dải này
+    # được tách rời hoàn toàn với Tím (bắt đầu tại 125).
+    hsv_max: [124, 255, 255]
+    hsv_extension_min: [115, 180, 25]
+    hsv_extension_max: [124, 255, 255]
+    # Chỉ dùng trong bộ tách chuỗi theo Product Profile.  Một số webcam làm
+    # Xanh dương trung tâm tối đi (hue 115-125, bão hòa thấp), trong khi Tím
+    # cũng có hue tương tự. Bộ fallback chỉ chấp nhận dải này khi đủ cả 5 slot
+    # và đúng thứ tự màu, nên không nới phân loại màu dùng độc lập.
+    profile_hsv_extension_min: [115, 40, 25]
+    profile_hsv_extension_max: [124, 255, 255]
+    lab_min: [0, 85, 15]
+    lab_max: [255, 225, 155]
+    classification: *classifier_defaults
+  green:
+    display_name: "Xanh lá"
+    aliases: ["xanh lá", "xanh la", "xanh lá cây", "xanh la cay", "xanh lục", "xanh luc", "green"]
+    hsv_min: [36, 35, 25]
+    hsv_max: [89, 255, 255]
+    lab_min: [0, 25, 105]
+    lab_max: [255, 135, 255]
+    classification: *classifier_defaults
